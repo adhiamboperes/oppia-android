@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.work.Configuration
 import dagger.BindsInstance
 import org.oppia.android.app.activity.ActivityComponentImpl
+import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 import org.oppia.android.domain.oppialogger.analytics.AnalyticsStartupListener
 import javax.inject.Provider
-import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
 
 /**
  * Root Dagger component for the application. All application-scoped modules should be included in

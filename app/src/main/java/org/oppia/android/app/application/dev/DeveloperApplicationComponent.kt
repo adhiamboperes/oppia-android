@@ -3,6 +3,7 @@ package org.oppia.android.app.application.dev
 import dagger.Component
 import org.oppia.android.app.activity.route.ActivityRouterModule
 import org.oppia.android.app.application.ApplicationComponent
+import org.oppia.android.app.application.ApplicationLifecycleObserverListenerModule
 import org.oppia.android.app.application.ApplicationModule
 import org.oppia.android.app.application.ApplicationStartupListenerModule
 import org.oppia.android.app.devoptions.DeveloperOptionsModule
@@ -64,7 +65,6 @@ import org.oppia.android.util.parser.image.ImageParsingModule
 import org.oppia.android.util.system.OppiaClockModule
 import org.oppia.android.util.threading.DispatcherModule
 import javax.inject.Singleton
-import org.oppia.android.app.application.ApplicationLifecycleObserverListenerModule
 
 /**
  * Root Dagger component for developer versions of the application.

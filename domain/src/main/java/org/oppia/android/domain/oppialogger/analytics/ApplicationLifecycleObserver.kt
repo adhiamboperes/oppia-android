@@ -14,6 +14,7 @@ import org.oppia.android.app.model.ProfileId
 import org.oppia.android.app.model.ScreenName
 import org.oppia.android.app.model.ScreenName.BACKGROUND_SCREEN
 import org.oppia.android.app.model.ScreenName.FOREGROUND_SCREEN
+import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 import org.oppia.android.domain.oppialogger.LoggingIdentifierController
 import org.oppia.android.domain.oppialogger.OppiaLogger
@@ -27,7 +28,6 @@ import org.oppia.android.util.system.OppiaClock
 import org.oppia.android.util.threading.BackgroundDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
-import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
 
 /** Observer that observes application and activity lifecycle. */
 @Singleton
@@ -45,7 +45,9 @@ class ApplicationLifecycleObserver @Inject constructor(
   @BackgroundDispatcher private val backgroundDispatcher: CoroutineDispatcher,
   @EnablePerformanceMetricsCollection
   private val enablePerformanceMetricsCollection: PlatformParameterValue<Boolean>
-) : ApplicationStartupListener, ApplicationLifecycleObserverListener, LifecycleObserver,
+) : ApplicationStartupListener,
+  ApplicationLifecycleObserverListener,
+  LifecycleObserver,
   Application.ActivityLifecycleCallbacks {
 
   /**

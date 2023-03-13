@@ -9,5 +9,3 @@ interface ApplicationLifecycleObserverListener {
   /** Gets called when the application goes to the background. */
   fun onAppInBackground()
 }
-
-
