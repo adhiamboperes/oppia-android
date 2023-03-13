@@ -27,6 +27,7 @@ import org.oppia.android.util.system.OppiaClock
 import org.oppia.android.util.threading.BackgroundDispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
 
 /** Observer that observes application and activity lifecycle. */
 @Singleton
@@ -44,7 +45,8 @@ class ApplicationLifecycleObserver @Inject constructor(
   @BackgroundDispatcher private val backgroundDispatcher: CoroutineDispatcher,
   @EnablePerformanceMetricsCollection
   private val enablePerformanceMetricsCollection: PlatformParameterValue<Boolean>
-) : ApplicationStartupListener, LifecycleObserver, Application.ActivityLifecycleCallbacks {
+) : ApplicationStartupListener, ApplicationLifecycleObserverListener, LifecycleObserver,
+  Application.ActivityLifecycleCallbacks {
 
   /**
    * Timestamp indicating the time of application start-up. It will be used to calculate the
@@ -91,7 +93,7 @@ class ApplicationLifecycleObserver @Inject constructor(
 
   /** Occurs when application comes to foreground. */
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
-  fun onAppInForeground() {
+  override fun onAppInForeground() {
     val timeDifferenceMs = oppiaClock.getCurrentTimeMs() - firstTimestamp
     if (timeDifferenceMs > inactivityLimitMillis) {
       loggingIdentifierController.updateSessionId()
@@ -100,12 +102,13 @@ class ApplicationLifecycleObserver @Inject constructor(
       cpuPerformanceSnapshotter.updateAppIconification(APP_IN_FOREGROUND)
     }
     performanceMetricsController.setAppInForeground()
+    // let learning time controller know app is in foreground
     logAppLifecycleEventInBackground(learnerAnalyticsLogger::logAppInForeground)
   }
 
   /** Occurs when application goes to background. */
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-  fun onAppInBackground() {
+  override fun onAppInBackground() {
     firstTimestamp = oppiaClock.getCurrentTimeMs()
     if (enablePerformanceMetricsCollection.value) {
       cpuPerformanceSnapshotter.updateAppIconification(APP_IN_BACKGROUND)
