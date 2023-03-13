@@ -7,6 +7,7 @@ import org.oppia.android.app.activity.ActivityComponentImpl
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 import org.oppia.android.domain.oppialogger.analytics.AnalyticsStartupListener
 import javax.inject.Provider
+import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
 
 /**
  * Root Dagger component for the application. All application-scoped modules should be included in
@@ -30,4 +31,6 @@ interface ApplicationComponent : ApplicationInjector {
   fun getAnalyticsStartupListenerStartupListeners(): Set<AnalyticsStartupListener>
 
   fun getWorkManagerConfiguration(): Configuration
+
+  fun getApplicationLifeCycleObserverListeners(): Set<ApplicationLifecycleObserverListener>
 }
