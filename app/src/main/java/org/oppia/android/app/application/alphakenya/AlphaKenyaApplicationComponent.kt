@@ -64,6 +64,7 @@ import org.oppia.android.util.parser.image.ImageParsingModule
 import org.oppia.android.util.system.OppiaClockModule
 import org.oppia.android.util.threading.DispatcherModule
 import javax.inject.Singleton
+import org.oppia.android.app.application.ApplicationLifecycleObserverListenerModule
 
 /**
  * Root Dagger component for the alpha version of the application specific to a user study in Kenya.
@@ -98,7 +99,7 @@ import javax.inject.Singleton
     HintsAndSolutionProdModule::class, MetricLogSchedulerModule::class,
     PerformanceMetricsConfigurationsModule::class, AlphaBuildFlavorModule::class,
     KenyaAlphaEventLoggingConfigurationModule::class, CpuPerformanceSnapshotterModule::class,
-    PerformanceMetricsAssessorModule::class,
+    PerformanceMetricsAssessorModule::class, ApplicationLifecycleObserverListenerModule::class,
   ]
 )
 interface AlphaKenyaApplicationComponent : ApplicationComponent {

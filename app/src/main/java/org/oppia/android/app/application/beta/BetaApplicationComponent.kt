@@ -63,6 +63,7 @@ import org.oppia.android.util.parser.image.ImageParsingModule
 import org.oppia.android.util.system.OppiaClockModule
 import org.oppia.android.util.threading.DispatcherModule
 import javax.inject.Singleton
+import org.oppia.android.app.application.ApplicationLifecycleObserverListenerModule
 
 /**
  * Root Dagger component for beta versions of the application.
@@ -98,7 +99,7 @@ import javax.inject.Singleton
     PerformanceMetricsConfigurationsModule::class, BetaBuildFlavorModule::class,
     EventLoggingConfigurationModule::class, ActivityRouterModule::class,
     CpuPerformanceSnapshotterModule::class, PerformanceMetricsAssessorModule::class,
-
+    ApplicationLifecycleObserverListenerModule::class,
   ]
 )
 interface BetaApplicationComponent : ApplicationComponent {
