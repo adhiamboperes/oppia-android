@@ -10,7 +10,7 @@ import org.oppia.android.domain.oppialogger.OppiaLogger
 import org.oppia.android.util.data.AsyncResult
 import org.oppia.android.util.data.DataProvider
 import org.oppia.android.util.data.DataProviders
-import org.oppia.android.util.data.DataProviders.Companion.transformAsync
+import org.oppia.android.util.data.DataProviders.Companion.transform
 import org.oppia.android.util.system.OppiaClock
 
 private const val CACHE_NAME = "topic_learning_time_database"
@@ -73,19 +73,17 @@ class TopicLearningTimeController @Inject constructor(
     return pauseExplorationTimer() - startExplorationTimer()
   }
 
-  /** Returns a [TopicLearningTime] [DataProvider] for a specific topicId, per-profile basis. */
-  fun retrieveAggregateTopicLearningTime(
+  /** Returns the [TopicLearningTime] [DataProvider] for a specific topicId, per-profile basis. */
+  internal fun retrieveAggregateTopicLearningTimeDataProvider(
     profileId: ProfileId,
     topicId: String
   ): DataProvider<TopicLearningTime> {
     return retrieveCacheStore(profileId)
-      .transformAsync(
+      .transform(
         RETRIEVE_AGGREGATE_LEARNING_TIME_PROVIDER_ID
       ) { learningTimeDb ->
-        AsyncResult.Success(
-          learningTimeDb.aggregateTopicLearningTimeMap[topicId]
-            ?: TopicLearningTime.getDefaultInstance()
-        )
+        learningTimeDb.aggregateTopicLearningTimeMap[topicId]
+          ?: TopicLearningTime.getDefaultInstance()
       }
   }
 
