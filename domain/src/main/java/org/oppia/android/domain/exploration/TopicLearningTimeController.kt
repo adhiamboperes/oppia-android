@@ -1,5 +1,6 @@
 package org.oppia.android.domain.exploration
 
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.Deferred
 import org.oppia.android.app.model.ProfileId
@@ -18,6 +19,7 @@ private const val RECORD_AGGREGATE_LEARNING_TIME_PROVIDER_ID =
   "record_aggregate_learning_time_provider_id"
 private const val RETRIEVE_AGGREGATE_LEARNING_TIME_PROVIDER_ID =
   "retrieve_aggregate_learning_time_provider_id"
+private val MAX_AGE_OF_LEARNING_TIME_MILLIS = TimeUnit.DAYS.toMillis(10)
 
 /** Controller for tracking the amount of active time a user has spent in a topic. */
 class TopicLearningTimeController @Inject constructor(
@@ -72,6 +74,60 @@ class TopicLearningTimeController @Inject constructor(
   private fun getLearningSessionDuration(): Long {
     return pauseExplorationTimer() - startExplorationTimer()
   }
+
+  /**
+   * Records the tracked active exploration time. Returns a [DataProvider] that provides exactly one [AsyncResult] to indicate whether
+   * this operation has succeeded.
+   *
+   * @param profileId the ID corresponding to the profile for which progress needs to be stored
+   * @param topicId the ID corresponding to the topic for which duration needs to be stored
+   * @param sessionDuration the tracked exploration duration between start and pause
+   * @return a [DataProvider] that indicates the success/failure of this record operation
+   */
+  fun recordAggregateTopicLearningTime(
+    profileId: ProfileId,
+    topicId: String,
+    sessionDuration: Long
+  ): DataProvider<Any?> {
+    val deferred = retrieveCacheStore(profileId).storeDataWithCustomChannelAsync(
+      updateInMemoryCache = true
+    ) { topicLearningTimeDatabase ->
+
+      val previousAggregateLearningTime =
+        topicLearningTimeDatabase.aggregateTopicLearningTimeMap[topicId]
+
+      val topicLearningTimeBuilder = if (previousAggregateLearningTime != null) {
+        previousAggregateLearningTime.toBuilder()
+      } else {
+        TopicLearningTime.newBuilder()
+          .setTopicId(topicId)
+          .setTopicLearningTimeMs(sessionDuration)
+          .setLastUpdatedTimeMs(oppiaClock.getCurrentTimeMs())
+      }
+
+      if (previousAggregateLearningTime != null &&
+        !lastUpdatedTimestampIsStale(previousAggregateLearningTime.lastUpdatedTimeMs)
+      ) {
+        topicLearningTimeBuilder.topicLearningTimeMs += sessionDuration
+      } else {
+        topicLearningTimeBuilder.topicLearningTimeMs = sessionDuration
+      }
+      topicLearningTimeBuilder.lastUpdatedTimeMs = oppiaClock.getCurrentTimeMs()
+
+      val topicLearningTime = topicLearningTimeBuilder.build()
+
+      val topicLearningTimeDatabaseBuilder = topicLearningTimeDatabase.toBuilder()
+        .putAggregateTopicLearningTime(topicId, topicLearningTime)
+      Pair(topicLearningTimeDatabaseBuilder.build(), TopicLearningTimeActionStatus.SUCCESS)
+
+    }
+    return dataProviders.createInMemoryDataProviderAsync(RECORD_AGGREGATE_LEARNING_TIME_PROVIDER_ID) {
+      return@createInMemoryDataProviderAsync getDeferredResult(deferred)
+    }
+  }
+
+  private fun lastUpdatedTimestampIsStale(lastUpdatedTimestamp: Long) =
+    (oppiaClock.getCurrentTimeMs() - lastUpdatedTimestamp) > MAX_AGE_OF_LEARNING_TIME_MILLIS
 
   /** Returns the [TopicLearningTime] [DataProvider] for a specific topicId, per-profile basis. */
   internal fun retrieveAggregateTopicLearningTimeDataProvider(
