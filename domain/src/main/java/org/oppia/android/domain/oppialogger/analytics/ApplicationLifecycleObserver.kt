@@ -7,14 +7,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.oppia.android.app.model.ProfileId
 import org.oppia.android.app.model.ScreenName
 import org.oppia.android.app.model.ScreenName.BACKGROUND_SCREEN
+import org.oppia.android.app.model.ScreenName.EXPLORATION_ACTIVITY
 import org.oppia.android.app.model.ScreenName.FOREGROUND_SCREEN
-import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
+import org.oppia.android.domain.exploration.ExplorationActiveTimeListener
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 import org.oppia.android.domain.oppialogger.LoggingIdentifierController
 import org.oppia.android.domain.oppialogger.OppiaLogger
@@ -26,8 +29,6 @@ import org.oppia.android.util.platformparameter.EnablePerformanceMetricsCollecti
 import org.oppia.android.util.platformparameter.PlatformParameterValue
 import org.oppia.android.util.system.OppiaClock
 import org.oppia.android.util.threading.BackgroundDispatcher
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Observer that observes application and activity lifecycle. */
 @Singleton
@@ -44,9 +45,9 @@ class ApplicationLifecycleObserver @Inject constructor(
   @LearnerAnalyticsInactivityLimitMillis private val inactivityLimitMillis: Long,
   @BackgroundDispatcher private val backgroundDispatcher: CoroutineDispatcher,
   @EnablePerformanceMetricsCollection
-  private val enablePerformanceMetricsCollection: PlatformParameterValue<Boolean>
+  private val enablePerformanceMetricsCollection: PlatformParameterValue<Boolean>,
+  private val explorationActiveTimeListener: ExplorationActiveTimeListener
 ) : ApplicationStartupListener,
-  ApplicationLifecycleObserverListener,
   LifecycleObserver,
   Application.ActivityLifecycleCallbacks {
 
@@ -95,7 +96,7 @@ class ApplicationLifecycleObserver @Inject constructor(
 
   /** Occurs when application comes to foreground. */
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
-  override fun onAppInForeground() {
+  fun onAppInForeground() {
     val timeDifferenceMs = oppiaClock.getCurrentTimeMs() - firstTimestamp
     if (timeDifferenceMs > inactivityLimitMillis) {
       loggingIdentifierController.updateSessionId()
@@ -103,19 +104,24 @@ class ApplicationLifecycleObserver @Inject constructor(
     if (enablePerformanceMetricsCollection.value) {
       cpuPerformanceSnapshotter.updateAppIconification(APP_IN_FOREGROUND)
     }
+    if (getCurrentScreen() == EXPLORATION_ACTIVITY) {
+      explorationActiveTimeListener.onAppInForeground()
+    }
     performanceMetricsController.setAppInForeground()
-    // let learning time controller know app is in foreground
     logAppLifecycleEventInBackground(learnerAnalyticsLogger::logAppInForeground)
   }
 
   /** Occurs when application goes to background. */
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-  override fun onAppInBackground() {
+  fun onAppInBackground() {
     firstTimestamp = oppiaClock.getCurrentTimeMs()
     if (enablePerformanceMetricsCollection.value) {
       cpuPerformanceSnapshotter.updateAppIconification(APP_IN_BACKGROUND)
     }
     performanceMetricsController.setAppInBackground()
+    if (getCurrentScreen() == EXPLORATION_ACTIVITY) {
+      explorationActiveTimeListener.onAppInBackground()
+    }
     logAppLifecycleEventInBackground(learnerAnalyticsLogger::logAppInBackground)
   }
 

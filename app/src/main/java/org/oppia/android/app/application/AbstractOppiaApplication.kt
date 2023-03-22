@@ -11,7 +11,7 @@ import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
 import org.oppia.android.app.activity.ActivityComponent
 import org.oppia.android.app.activity.ActivityComponentFactory
-import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
+import org.oppia.android.domain.exploration.ExplorationActiveTimeListener
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 
 /** The root base [Application] of the Oppia app. */
@@ -54,9 +54,9 @@ abstract class AbstractOppiaApplication(
     }
     component.getApplicationStartupListeners().forEach(ApplicationStartupListener::onCreate)
     component.getApplicationLifeCycleObserverListeners()
-      .forEach(ApplicationLifecycleObserverListener::onAppInForeground)
+      .forEach(ExplorationActiveTimeListener::onAppInForeground)
     component.getApplicationLifeCycleObserverListeners()
-      .forEach(ApplicationLifecycleObserverListener::onAppInBackground)
+      .forEach(ExplorationActiveTimeListener::onAppInBackground)
   }
 
   override fun getWorkManagerConfiguration(): Configuration {

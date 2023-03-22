@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.work.Configuration
 import dagger.BindsInstance
 import org.oppia.android.app.activity.ActivityComponentImpl
-import org.oppia.android.domain.oppialogger.ApplicationLifecycleObserverListener
+import org.oppia.android.domain.exploration.ExplorationActiveTimeListener
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 import org.oppia.android.domain.oppialogger.analytics.AnalyticsStartupListener
 import javax.inject.Provider
@@ -32,5 +32,5 @@ interface ApplicationComponent : ApplicationInjector {
 
   fun getWorkManagerConfiguration(): Configuration
 
-  fun getApplicationLifeCycleObserverListeners(): Set<ApplicationLifecycleObserverListener>
+  fun getApplicationLifeCycleObserverListeners(): Set<ExplorationActiveTimeListener>
 }
