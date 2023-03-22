@@ -1,13 +1,13 @@
 package org.oppia.android.domain.survey
 
-import java.util.*
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import org.oppia.android.app.model.ProfileId
 import org.oppia.android.domain.exploration.TopicLearningTimeController
 import org.oppia.android.domain.profile.ProfileManagementController
 import org.oppia.android.util.data.DataProvider
 import org.oppia.android.util.system.OppiaClock
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val SURVEY_LAST_SHOWN_DATE_LIMIT_DAYS = 30
 private val SURVEY_AGGREGATE_TOPIC_LEARNING_TIME_LIMIT_MINUTES = TimeUnit.MINUTES.toMillis(5)
@@ -69,7 +69,7 @@ class SurveyGatingController @Inject constructor(
     profileId: ProfileId,
     topicId: String
   ): Boolean {
-    //getTopicAggregateLearningTime(profileId, topicId)
+    // getTopicAggregateLearningTime(profileId, topicId)
     return true
   }
 
