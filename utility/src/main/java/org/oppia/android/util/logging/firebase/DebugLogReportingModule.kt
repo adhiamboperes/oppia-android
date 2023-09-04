@@ -7,7 +7,6 @@ import org.oppia.android.util.logging.AnalyticsEventLogger
 import org.oppia.android.util.logging.ExceptionLogger
 import org.oppia.android.util.logging.performancemetrics.PerformanceMetricsEventLogger
 import javax.inject.Singleton
-
 /** Provides debug log reporting dependencies. */
 @Module
 class DebugLogReportingModule {
@@ -30,6 +29,5 @@ class DebugLogReportingModule {
 
   @Provides
   @Singleton
-  fun provideDebugFirestoreLogger(debugFirestoreEventLogger: DebugFirestoreEventLogger):
-    FirestoreEventLogger = debugFirestoreEventLogger
+  fun provideDebugFirestoreLogger(): FirestoreEventLogger = DebugFirestoreEventLogger()
 }
