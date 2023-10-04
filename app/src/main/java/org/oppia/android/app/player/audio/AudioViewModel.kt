@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import org.oppia.android.R
 import org.oppia.android.app.fragment.FragmentScope
+import org.oppia.android.app.model.AudioLanguage
 import org.oppia.android.app.model.State
 import org.oppia.android.app.model.Voiceover
 import org.oppia.android.app.model.VoiceoverMapping
@@ -96,7 +97,9 @@ class AudioViewModel @Inject constructor(
     this.reloadingMainContent = reloadingMainContent
     voiceoverMap = voiceoverMapping.voiceoverMappingMap
     currentContentId = targetContentId
-    languages = voiceoverMap.keys.toList().map { machineLocale.run { it.toMachineLowerCase() } }
+    languages =
+      voiceoverMap.keys.toList().filter { it in supportedAudioLanguageCodes }
+        .map { machineLocale.run { it.toMachineLowerCase() } }
     selectedLanguageUnavailable.set(false)
 
     val localeLanguageCode =
@@ -131,6 +134,23 @@ class AudioViewModel @Inject constructor(
       voiceOverToUri(voiceoverMap[languageCode]), currentContentId, languageCode
     )
   }
+
+  /** Gets language code by [AudioLanguage]. */
+  fun getAudioLanguage(audioLanguage: AudioLanguage): String {
+    return when (audioLanguage) {
+      AudioLanguage.HINDI_AUDIO_LANGUAGE -> "hi"
+      AudioLanguage.FRENCH_AUDIO_LANGUAGE -> "fr"
+      AudioLanguage.CHINESE_AUDIO_LANGUAGE -> "zh"
+      AudioLanguage.BRAZILIAN_PORTUGUESE_LANGUAGE -> "pt"
+      AudioLanguage.ARABIC_LANGUAGE -> "ar"
+      AudioLanguage.NIGERIAN_PIDGIN_LANGUAGE -> "pcm"
+      AudioLanguage.NO_AUDIO, AudioLanguage.UNRECOGNIZED, AudioLanguage.AUDIO_LANGUAGE_UNSPECIFIED,
+      AudioLanguage.ENGLISH_AUDIO_LANGUAGE -> "en"
+    }
+  }
+
+  private val supportedAudioLanguageCodes =
+    AudioLanguage.values().toList().map { audioLanguage -> getAudioLanguage(audioLanguage) }
 
   /** Plays or pauses AudioController depending on passed in state. */
   fun togglePlayPause(type: UiAudioPlayStatus?) {
