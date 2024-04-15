@@ -202,6 +202,8 @@ message Classroom {
 
   // The last time this classroom was updated.
   int64 last_update_time_ms = 2;
+
+  string classroom_id = 3;
 }
 
 // Corresponds to the list of topics that are currently being played and are not fully finished.

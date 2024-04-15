@@ -16,6 +16,7 @@ import org.oppia.android.app.home.topiclist.AllTopicsViewModel
 import org.oppia.android.app.home.topiclist.TopicSummaryViewModel
 import org.oppia.android.app.model.AppStartupState
 import org.oppia.android.app.model.ProfileId
+import org.oppia.android.app.model.TopicList
 import org.oppia.android.app.model.TopicSummary
 import org.oppia.android.app.recyclerview.BindableAdapter
 import org.oppia.android.app.translation.AppLanguageResourceHandler
@@ -53,7 +54,8 @@ class HomeFragmentPresenter @Inject constructor(
   private val dateTimeUtil: DateTimeUtil,
   private val translationController: TranslationController,
   private val multiTypeBuilderFactory: BindableAdapter.MultiTypeBuilder.Factory,
-  private val appStartupStateController: AppStartupStateController
+  private val appStartupStateController: AppStartupStateController,
+  private val homeViewModel: HomeViewModel
 ) {
   private val routeToTopicPlayStoryListener = activity as RouteToTopicPlayStoryListener
   private lateinit var binding: HomeFragmentBinding
@@ -67,6 +69,7 @@ class HomeFragmentPresenter @Inject constructor(
     internalProfileId = activity.intent.getIntExtra(NAVIGATION_PROFILE_ID_ARGUMENT_KEY, -1)
     logHomeActivityEvent()
 
+    // If switching to factory method of initialization, then this will change
     val homeViewModel = HomeViewModel(
       activity,
       fragment,
@@ -199,6 +202,31 @@ class HomeFragmentPresenter @Inject constructor(
       topicSummary.topicId,
       topicSummary.firstStoryId
     )
+  }
+
+  // Not sure that [internalProfileId] is needed, you will adjust as required
+  fun onClassroomTileClicked(internalProfileId: Int, classroomId: String) {
+    fetchClassroomTopics(internalProfileId, classroomId)
+  }
+
+  private fun fetchClassroomTopics(internalProfileId: Int, classroomId: String) {
+    classroomController.fetchTopics(internalProfileId, classroomId).toLiveData()
+      .observe(fragment.viewLifecycleOwner) { result ->
+        when (result) {
+          is AsyncResult.Failure -> {
+            oppiaLogger.e(
+              "HomeFragment", "Failed to retrieve topics for classroomId $classroomId", result.error
+            )
+          }
+          is AsyncResult.Pending -> {} // Display nothing until a valid result is available.
+          is AsyncResult.Success -> updateTopicList()
+        }
+      }
+  }
+
+  private fun updateTopicList(topicList: TopicList) {
+    homeViewModel.topicList.clear()
+    homeViewModel.topicList.add(topicList)
   }
 
   private fun logHomeActivityEvent() {

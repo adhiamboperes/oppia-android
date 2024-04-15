@@ -2,6 +2,7 @@ package org.oppia.android.app.home
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ObservableField
+import androidx.databinding.ObservableList
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -14,6 +15,7 @@ import org.oppia.android.app.home.promotedlist.PromotedStoryViewModel
 import org.oppia.android.app.home.topiclist.AllTopicsViewModel
 import org.oppia.android.app.home.topiclist.TopicSummaryClickListener
 import org.oppia.android.app.home.topiclist.TopicSummaryViewModel
+import org.oppia.android.app.model.Classroom
 import org.oppia.android.app.model.ComingSoonTopicList
 import org.oppia.android.app.model.Profile
 import org.oppia.android.app.model.ProfileId
@@ -22,6 +24,7 @@ import org.oppia.android.app.model.PromotedStoryList
 import org.oppia.android.app.model.TopicList
 import org.oppia.android.app.translation.AppLanguageResourceHandler
 import org.oppia.android.app.utility.datetime.DateTimeUtil
+import org.oppia.android.app.viewmodel.ObservableArrayList
 import org.oppia.android.app.viewmodel.ObservableViewModel
 import org.oppia.android.domain.oppialogger.OppiaLogger
 import org.oppia.android.domain.profile.ProfileManagementController
@@ -33,6 +36,7 @@ import org.oppia.android.util.data.DataProviders.Companion.combineWith
 import org.oppia.android.util.data.DataProviders.Companion.toLiveData
 import org.oppia.android.util.parser.html.StoryHtmlParserEntityType
 import org.oppia.android.util.parser.html.TopicHtmlParserEntityType
+import javax.inject.Inject
 
 private const val PROFILE_AND_PROMOTED_ACTIVITY_COMBINED_PROVIDER_ID =
   "profile+promotedActivityList"
@@ -40,7 +44,9 @@ private const val HOME_FRAGMENT_COMBINED_PROVIDER_ID =
   "profile+promotedActivityList+topicListProvider"
 
 /** [ViewModel] for layouts in home fragment. */
-class HomeViewModel(
+// Maybe create a factory method to create the HomeViewmodel to provide the properties that cannot
+// be injected, i.e. internalProfileId.
+class HomeViewModel @Inject constructor(
   private val activity: AppCompatActivity,
   private val fragment: Fragment,
   private val oppiaLogger: OppiaLogger,
@@ -53,13 +59,13 @@ class HomeViewModel(
   private val dateTimeUtil: DateTimeUtil,
   private val translationController: TranslationController
 ) : ObservableViewModel() {
-
+  val topicList: ObservableList<TopicList> = ObservableArrayList()
   private val profileId: ProfileId = ProfileId.newBuilder().setInternalId(internalProfileId).build()
   private val promotedStoryListLimit = activity.resources.getInteger(
     R.integer.promoted_story_list_limit
   )
 
-/**
+  /**
    * A Boolean property indicating the visibility state of a progress bar.
    * This property is used to control the visibility of a progress bar in a user interface.
    * When set to true, the progress bar is made visible, indicating that an ongoing task
@@ -80,6 +86,10 @@ class HomeViewModel(
     topicListController.getTopicList(profileId)
   }
 
+  private val classroomListDataProvider: DataProvider<List<Classroom>> by lazy {
+    classroomController.getClassroomList()
+  }
+
   private val homeItemViewModelListDataProvider: DataProvider<List<HomeItemViewModel>> by lazy {
     // This will block until all data providers return initial results (which may be default
     // instances). If any of the data providers are pending or failed, the combined result will also
@@ -97,10 +107,10 @@ class HomeViewModel(
         listOfNotNull(computeWelcomeViewModel(profile))
       }
     }.combineWith(
-      topicListSummaryDataProvider,
+      classroomListDataProvider,
       HOME_FRAGMENT_COMBINED_PROVIDER_ID
-    ) { homeItemViewModelList, topicList ->
-      homeItemViewModelList + computeAllTopicsItemsViewModelList(topicList)
+    ) { homeItemViewModelList, classroomList ->
+      homeItemViewModelList + computeClassroomItemsViewModelList(classroomList)
     }
   }
 
@@ -123,7 +133,7 @@ class HomeViewModel(
         is AsyncResult.Pending -> listOf()
         is AsyncResult.Success -> {
           isProgressBarVisible.set(false)
-          itemListResult.value
+          itemListResult.value + computeAllTopicsItemsViewModelList(topicList)
         }
       }
     }
@@ -246,6 +256,8 @@ class HomeViewModel(
    * [AllTopicsViewModel]). Returns an empty list if there are no topics to display to the learner (caused by
    * either error or pending data providers).
    */
+
+  // Modify this function to expect an [ObservableList<TopicList>] input or something similar
   private fun computeAllTopicsItemsViewModelList(
     topicList: TopicList
   ): List<HomeItemViewModel> {
@@ -263,5 +275,13 @@ class HomeViewModel(
     return if (allTopicsList.isNotEmpty()) {
       listOf(AllTopicsViewModel) + allTopicsList
     } else emptyList()
+  }
+
+  private fun computeClassroomItemsViewModelList(
+    classroomList: List<Classroom>
+  ): List<HomeItemViewModel> {
+
+    // Do actual computation
+    return emptyList()
   }
 }

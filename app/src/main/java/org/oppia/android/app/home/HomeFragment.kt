@@ -12,8 +12,12 @@ import org.oppia.android.app.model.TopicSummary
 import javax.inject.Inject
 
 /** Fragment that contains an introduction to the app. */
-class HomeFragment : InjectableFragment(), TopicSummaryClickListener {
-  @Inject lateinit var homeFragmentPresenter: HomeFragmentPresenter
+class HomeFragment :
+  InjectableFragment(),
+  TopicSummaryClickListener,
+  RouteToClassroomTopicsListener {
+  @Inject
+  lateinit var homeFragmentPresenter: HomeFragmentPresenter
 
   override fun onAttach(context: Context) {
     super.onAttach(context)
@@ -30,5 +34,9 @@ class HomeFragment : InjectableFragment(), TopicSummaryClickListener {
 
   override fun onTopicSummaryClicked(topicSummary: TopicSummary) {
     homeFragmentPresenter.onTopicSummaryClicked(topicSummary)
+  }
+
+  override fun routeToClassroomTopics(internalProfileId: Int, classroomId: String) {
+    homeFragmentPresenter.onClassroomTileClicked(internalProfileId, classroomId)
   }
 }
