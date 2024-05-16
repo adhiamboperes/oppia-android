@@ -64,6 +64,7 @@ MAVEN_PRODUCTION_DEPENDENCY_VERSIONS = {
     "com.google.firebase:firebase-firestore-ktx": "24.2.1",
     "com.google.gms:google-services": "4.3.3",
     "com.google.guava:failureaccess": "1.0.1",
+    "com.google.guava:listenablefuture":"9999.0-empty-to-avoid-conflict-with-guava",
     "com.google.j2objc:j2objc-annotations": "1.3",
     "com.google.protobuf:protobuf-javalite": "3.17.3",
     "com.squareup.moshi:moshi-kotlin": "1.13.0",
@@ -83,6 +84,14 @@ MAVEN_PRODUCTION_DEPENDENCY_VERSIONS = {
     "org.jetbrains.kotlinx:kotlinx-coroutines-core": "1.6.4",
     "org.jetbrains.kotlinx:kotlinx-coroutines-guava": "1.6.4",
     "org.jetbrains:annotations:jar": "13.0",
+    "androidx.compose.material:material":"1.2.0-rc02",
+    "androidx.compose.foundation:foundation":"1.2.0-rc02",
+    "androidx.compose.foundation:foundation-layout":"1.2.0-rc02",
+    "androidx.compose.ui:ui":"1.2.0-rc02",
+    "androidx.compose.ui:ui-tooling":"1.2.0-rc02",
+    "androidx.compose.compiler:compiler":"1.2.0-rc02",
+    "androidx.compose.runtime:runtime":"1.2.0-rc02",
+    "androidx.compose.runtime:runtime-livedata":"1.2.0-rc02",
 }
 
 # Note to developers: Please keep this dict sorted by key to make it easier to find dependencies.
