@@ -20,7 +20,6 @@ import org.oppia.android.app.home.topiclist.AllTopicsViewModel
 import org.oppia.android.app.home.topiclist.TopicSummaryClickListener
 import org.oppia.android.app.home.topiclist.TopicSummaryViewModel
 import org.oppia.android.app.model.ClassroomList
-import org.oppia.android.app.model.ClassroomSummary
 import org.oppia.android.app.model.ComingSoonTopicList
 import org.oppia.android.app.model.Profile
 import org.oppia.android.app.model.ProfileId
@@ -62,7 +61,7 @@ class ClassroomListViewModel(
   private val resourceHandler: AppLanguageResourceHandler,
   private val dateTimeUtil: DateTimeUtil,
   private val translationController: TranslationController
-) : ObservableViewModel(), ClassroomSummaryClickListener {
+) : ObservableViewModel() {
   private val profileId: ProfileId = ProfileId.newBuilder().setInternalId(internalProfileId).build()
   private val promotedStoryListLimit = activity.resources.getInteger(
     R.integer.promoted_story_list_limit
@@ -267,7 +266,7 @@ class ClassroomListViewModel(
   ): List<HomeItemViewModel> {
     return classroomList.classroomSummaryList.map { ephemeralClassroomSummary ->
       ClassroomSummaryViewModel(
-        this,
+        fragment as ClassroomSummaryClickListener,
         ephemeralClassroomSummary,
         translationController
       )
@@ -299,7 +298,7 @@ class ClassroomListViewModel(
     } else emptyList()
   }
 
-  private fun fetchAndUpdateTopicList(classroomId: String = "") {
+  fun fetchAndUpdateTopicList(classroomId: String = "") {
     if (classroomId.isBlank()) {
       // Retrieve the last selected classroom ID if no specific classroom ID is provided.
       profileManagementController.retrieveLastSelectedClassroomId(profileId)
@@ -355,11 +354,5 @@ class ClassroomListViewModel(
         is AsyncResult.Pending -> {}
       }
     }
-  }
-
-  override fun onClassroomSummaryClicked(classroomSummary: ClassroomSummary) {
-    val classroomId = classroomSummary.classroomId
-    profileManagementController.updateLastSelectedClassroomId(profileId, classroomId)
-    fetchAndUpdateTopicList(classroomId)
   }
 }

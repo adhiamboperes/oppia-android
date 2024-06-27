@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
@@ -25,7 +26,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.unit.dp
-import androidx.databinding.Observable
 import androidx.databinding.ObservableList
 import androidx.fragment.app.Fragment
 import org.oppia.android.R
@@ -41,6 +41,7 @@ import org.oppia.android.app.home.classroomlist.ClassroomSummaryViewModel
 import org.oppia.android.app.home.promotedlist.PromotedStoryListViewModel
 import org.oppia.android.app.home.topiclist.AllTopicsViewModel
 import org.oppia.android.app.home.topiclist.TopicSummaryViewModel
+import org.oppia.android.app.model.ClassroomSummary
 import org.oppia.android.app.model.LessonThumbnail
 import org.oppia.android.app.model.LessonThumbnailGraphic
 import org.oppia.android.app.model.TopicSummary
@@ -80,6 +81,7 @@ class ClassroomListFragmentPresenter @Inject constructor(
   private lateinit var binding: ClassroomListFragmentBinding
   private lateinit var classroomListViewModel: ClassroomListViewModel
   private var internalProfileId: Int = -1
+  private val profileId = activity.intent.extractCurrentUserProfileId()
 
   /** Creates and returns the view for the [ClassroomListFragment]. */
   fun handleCreateView(inflater: LayoutInflater, container: ViewGroup?): View? {
@@ -89,7 +91,7 @@ class ClassroomListFragmentPresenter @Inject constructor(
       /* attachToRoot= */ false
     )
 
-    internalProfileId = activity.intent.extractCurrentUserProfileId().internalId
+    internalProfileId = profileId.internalId
 
     classroomListViewModel = ClassroomListViewModel(
       activity,
@@ -142,14 +144,6 @@ class ClassroomListFragmentPresenter @Inject constructor(
         ) {}
       }
     )
-
-    classroomListViewModel.selectedClassroomId
-      .addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-        override fun onPropertyChanged(sender: Observable, propertyId: Int) {
-          refreshComposeView()
-        }
-      })
-
     return binding.root
   }
 
@@ -160,6 +154,13 @@ class ClassroomListFragmentPresenter @Inject constructor(
       topicSummary.topicId,
       topicSummary.firstStoryId
     )
+  }
+
+  /** Filters topics. */
+  fun onClassroomSummaryClicked(classroomSummary: ClassroomSummary) {
+    val classroomId = classroomSummary.classroomId
+    profileManagementController.updateLastSelectedClassroomId(profileId, classroomId)
+    classroomListViewModel.fetchAndUpdateTopicList(classroomId)
   }
 
   private fun refreshComposeView() {
@@ -217,6 +218,7 @@ class ClassroomListFragmentPresenter @Inject constructor(
               horizontalArrangement = Arrangement.spacedBy(8.dp),
               modifier = Modifier
             ) { itemData ->
+              classroomListViewModel.homeItemViewModelListLiveData.observeAsState()
               TopicCard(topicSummaryViewModel = itemData)
             }
           }
