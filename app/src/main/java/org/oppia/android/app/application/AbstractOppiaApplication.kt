@@ -12,12 +12,14 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import dagger.hilt.android.HiltAndroidApp
 import org.oppia.android.app.activity.ActivityComponent
 import org.oppia.android.app.activity.ActivityComponentFactory
 import org.oppia.android.app.model.BuildFlavor
 import org.oppia.android.domain.oppialogger.ApplicationStartupListener
 
 /** The root base [Application] of the Oppia app. */
+@HiltAndroidApp
 abstract class AbstractOppiaApplication(
   createComponentBuilder: () -> ApplicationComponent.Builder
 ) : MultiDexApplication(),
