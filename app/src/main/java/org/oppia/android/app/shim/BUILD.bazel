@@ -78,5 +78,6 @@ kt_android_library(
         ":impl",
         ":intent_factory_shim",
         ":view_binding_shim",
+        "//third_party:com_google_dagger_hilt-android",
     ],
 )

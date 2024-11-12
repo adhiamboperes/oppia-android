@@ -61,6 +61,7 @@ MAVEN_PRODUCTION_DEPENDENCY_VERSIONS = {
     "com.google.android.flexbox:flexbox": "3.0.0",
     "com.google.android.material:material": "1.3.0",
     "com.google.auto.value:auto-value-annotations": "1.8.1",
+    "com.google.dagger:hilt-android": "2.35",
     "com.google.errorprone:error_prone_annotations": "2.11.0",
     "com.google.firebase:firebase-analytics": "17.5.0",
     "com.google.firebase:firebase-appcheck": "16.0.0",

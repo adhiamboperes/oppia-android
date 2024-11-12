@@ -110,6 +110,7 @@ kt_android_library(
         ":activity_recreator",
         ":impl",
         "//:dagger",
+        "//third_party:com_google_dagger_hilt-android",
     ],
 )
 
