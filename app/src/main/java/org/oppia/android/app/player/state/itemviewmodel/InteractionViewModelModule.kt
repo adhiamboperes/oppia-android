@@ -3,6 +3,8 @@ package org.oppia.android.app.player.state.itemviewmodel
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import dagger.multibindings.StringKey
 
@@ -10,6 +12,7 @@ import dagger.multibindings.StringKey
  * Module to provide interaction view model-specific dependencies for interactions that should be
  * explicitly displayed to the user.
  */
+@InstallIn(SingletonComponent::class)
 @Module
 interface InteractionViewModelModule {
   // TODO(#300): Use a common source for these interaction IDs to de-duplicate them from
@@ -79,7 +82,8 @@ interface InteractionViewModelModule {
 
   // Note that Dagger doesn't support mixing binds & provides methods. See
   // https://stackoverflow.com/a/54592300 for the origin of this approach.
-  @Module
+  // @InstallIn(SingletonComponent::class)
+  // @Module
   companion object {
     @Provides
     @IntoMap

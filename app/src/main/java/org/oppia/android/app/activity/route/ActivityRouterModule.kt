@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.Intent
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import org.oppia.android.app.home.recentlyplayed.RecentlyPlayedActivity
 import org.oppia.android.app.model.DestinationScreen
 
 /** Module to bind destination screens to navigable activity routes. */
+@InstallIn(SingletonComponent::class)
 @Module
 class ActivityRouterModule {
   @Provides
